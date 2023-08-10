@@ -1,0 +1,12 @@
+package shelly 
+
+import (
+	"github.com/jodydadescott/shelly-go-sdk/shelly/plus/types"
+)
+
+
+type MessageHandlerFactory = types.MessageHandlerFactory
+type MessageHandler = types.MessageHandler
+type SetStatus = types.SetStatus
+
+type Config = types.ShellyConfig
