@@ -1,13 +1,18 @@
 package shelly
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/jodydadescott/shelly-go-sdk/plus"
+	"go.uber.org/zap"
 )
 
 type config interface {
 	GetHostname() string
 	GetPassword() string
 	IsDebugEnabled() bool
+	GetSendTimeout() time.Duration
 }
 
 type Client struct {
@@ -16,6 +21,7 @@ type Client struct {
 }
 
 func New(config config) *Client {
+	zap.L().Debug(fmt.Sprintf("SDK version %s", Version))
 	return &Client{
 		config: config,
 	}

@@ -44,20 +44,20 @@ func (t *ShellyRPCMethods) Clone() *ShellyRPCMethods {
 // of today is 4.
 // https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Shelly#configuration
 type ShellyConfig struct {
-	Auth          *ShellyAuthConfig `json:"auth,omitempty" yaml:"auth,omitempty"`
-	TLSClientCert *ShellyTLSConfig  `json:"tls_client_cert,omitempty" yaml:"tls_client_cert,omitempty"`
-	TLSClientKey  *ShellyTLSConfig  `json:"tls_client_key,omitempty" yaml:"tls_client_key,omitempty"`
-	UserCA        *ShellyTLSConfig  `json:"user_ca,omitempty" yaml:"user_ca,omitempty"`
-	Bluetooth     *BluetoothConfig  `json:"ble,omitempty" yaml:"ble,omitempty"`
-	Cloud         *CloudConfig      `json:"cloud,omitempty" yaml:"cloud,omitempty"`
-	Mqtt          *MqttConfig       `json:"mqtt,omitempty" yaml:"mqtt,omitempty"`
-	Ethernet      *EthernetConfig   `json:"eth,omitempty" yaml:"eth,omitempty"`
-	System        *SystemConfig     `json:"sys,omitempty" yaml:"sys,omitempty"`
-	Wifi          *WifiConfig       `json:"wifi,omitempty" yaml:"wifi,omitempty"`
-	Websocket     *WebsocketConfig  `json:"ws,omitempty" yaml:"ws,omitempty"`
-	Light         []*LightConfig    `json:"light,omitempty" yaml:"light,omitempty"`
-	Input         []*InputConfig    `json:"input,omitempty" yaml:"input,omitempty"`
-	Switch        []*SwitchConfig   `json:"switch,omitempty" yaml:"switch,omitempty"`
+	Auth          *ShellyAuthConfig          `json:"auth,omitempty" yaml:"auth,omitempty"`
+	TLSClientCert *ShellyTLSClientCertConfig `json:"tls_client_cert,omitempty" yaml:"tls_client_cert,omitempty"`
+	TLSClientKey  *ShellyTLSClientKeyConfig  `json:"tls_client_key,omitempty" yaml:"tls_client_key,omitempty"`
+	UserCA        *ShellyUserCAConfig        `json:"user_ca,omitempty" yaml:"user_ca,omitempty"`
+	Bluetooth     *BluetoothConfig           `json:"ble,omitempty" yaml:"ble,omitempty"`
+	Cloud         *CloudConfig               `json:"cloud,omitempty" yaml:"cloud,omitempty"`
+	Mqtt          *MqttConfig                `json:"mqtt,omitempty" yaml:"mqtt,omitempty"`
+	Ethernet      *EthernetConfig            `json:"eth,omitempty" yaml:"eth,omitempty"`
+	System        *SystemConfig              `json:"sys,omitempty" yaml:"sys,omitempty"`
+	Wifi          *WifiConfig                `json:"wifi,omitempty" yaml:"wifi,omitempty"`
+	Websocket     *WebsocketConfig           `json:"ws,omitempty" yaml:"ws,omitempty"`
+	Light         []*LightConfig             `json:"light,omitempty" yaml:"light,omitempty"`
+	Input         []*InputConfig             `json:"input,omitempty" yaml:"input,omitempty"`
+	Switch        []*SwitchConfig            `json:"switch,omitempty" yaml:"switch,omitempty"`
 }
 
 // Clone return copy
@@ -109,9 +109,25 @@ func (t *ShellyConfig) Markup() {
 	}
 
 	t.Auth.Markup()
-	t.TLSClientCert.Markup()
-	t.TLSClientKey.Markup()
+
+	if t.UserCA == nil {
+		t.UserCA = &ShellyUserCAConfig{}
+	}
+
 	t.UserCA.Markup()
+
+	if t.TLSClientCert == nil {
+		t.TLSClientCert = &ShellyTLSClientCertConfig{}
+	}
+
+	t.TLSClientCert.Markup()
+
+	if t.TLSClientKey == nil {
+		t.TLSClientKey = &ShellyTLSClientKeyConfig{}
+	}
+
+	t.TLSClientKey.Markup()
+
 	t.Bluetooth.Markup()
 	t.Cloud.Markup()
 	t.Mqtt.Markup()
@@ -274,41 +290,138 @@ func (t *ShellyAuthConfig) Sanatize() {
 	}
 }
 
-// ShellyTLSConfig Shelly TLS config
+// ShellyUserCAConfig Shelly UserCA config
 // https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Shelly#configuration
-type ShellyTLSConfig struct {
+type ShellyUserCAConfig struct {
+	// Enable true if MQTT connection is enabled, false otherwise
+	Enable bool `json:"enable" yaml:"enable"`
 	// Data is used by the following methods:
 	// PutUserCA : Contents of the PEM file (null if you want to delete the existing data). Required
 	// PutTLSClientCert : Contents of the client.crt file (null if you want to delete the existing data). Required
 	// PutTLSClientKey : Contents of the client.key file (null if you want to delete the existing data). Required
 	Data *string `json:"data,omitempty" yaml:"data,omitempty"`
-	// Append is used by the following methods:
-	// PutUserCA : true if more data will be appended afterwards, default false.
-	// PutTLSClientCert : true if more data will be appended afterwards, default false
-	// PutTLSClientKey : true if more data will be appended afterwards, default false
-	Append *bool `json:"append,omitempty" yaml:"append,omitempty"`
 }
 
 // Clone return copy
-func (t *ShellyTLSConfig) Clone() *ShellyTLSConfig {
-	c := &ShellyTLSConfig{}
+func (t *ShellyUserCAConfig) Clone() *ShellyUserCAConfig {
+	c := &ShellyUserCAConfig{}
 	copier.Copy(&c, &t)
 	return c
 }
 
 // Markup markup config
-func (t *ShellyTLSConfig) Markup() {
+func (t *ShellyUserCAConfig) Markup() {
 
 	if t == nil {
 		return
 	}
+
+	if t.Data == nil {
+		tmp := shellyUserCAExample
+		t.Data = &tmp
+	}
+
 }
 
 // Sanatize sanatize config
-func (t *ShellyTLSConfig) Sanatize() {
+func (t *ShellyUserCAConfig) Sanatize() {
 
 	if t == nil {
 		return
+	}
+
+	if !t.Enable {
+		t.Data = nil
+	}
+}
+
+// ShellyTLSClientCertConfig Shelly TLS Client Cert config
+// https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Shelly#configuration
+type ShellyTLSClientCertConfig struct {
+	// Enable true if MQTT connection is enabled, false otherwise
+	Enable bool `json:"enable" yaml:"enable"`
+	// Data is used by the following methods:
+	// PutUserCA : Contents of the PEM file (null if you want to delete the existing data). Required
+	// PutTLSClientCert : Contents of the client.crt file (null if you want to delete the existing data). Required
+	// PutTLSClientKey : Contents of the client.key file (null if you want to delete the existing data). Required
+	Data *string `json:"data,omitempty" yaml:"data,omitempty"`
+}
+
+// Clone return copy
+func (t *ShellyTLSClientCertConfig) Clone() *ShellyTLSClientCertConfig {
+	c := &ShellyTLSClientCertConfig{}
+	copier.Copy(&c, &t)
+	return c
+}
+
+// Markup markup config
+func (t *ShellyTLSClientCertConfig) Markup() {
+
+	if t == nil {
+		return
+	}
+
+	if t.Data == nil {
+		tmp := shellyTLSClientCertExample
+		t.Data = &tmp
+	}
+
+}
+
+// Sanatize sanatize config
+func (t *ShellyTLSClientCertConfig) Sanatize() {
+
+	if t == nil {
+		return
+	}
+
+	if !t.Enable {
+		t.Data = nil
+	}
+}
+
+// ShellyTLSClientKeyConfig Shelly TLS Client Key config
+// https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Shelly#configuration
+type ShellyTLSClientKeyConfig struct {
+	// Enable true if MQTT connection is enabled, false otherwise
+	Enable bool `json:"enable" yaml:"enable"`
+	// Data is used by the following methods:
+	// PutUserCA : Contents of the PEM file (null if you want to delete the existing data). Required
+	// PutTLSClientCert : Contents of the client.crt file (null if you want to delete the existing data). Required
+	// PutTLSClientKey : Contents of the client.key file (null if you want to delete the existing data). Required
+	Data *string `json:"data,omitempty" yaml:"data,omitempty"`
+}
+
+// Clone return copy
+func (t *ShellyTLSClientKeyConfig) Clone() *ShellyTLSClientKeyConfig {
+	c := &ShellyTLSClientKeyConfig{}
+	copier.Copy(&c, &t)
+	return c
+}
+
+// Markup markup config
+func (t *ShellyTLSClientKeyConfig) Markup() {
+
+	if t == nil {
+		return
+	}
+
+	if t.Data == nil {
+		tmp := shellyTLSClientKey
+		t.Data = &tmp
+	}
+
+}
+
+// Sanatize sanatize config
+func (t *ShellyTLSClientKeyConfig) Sanatize() {
+
+	if t == nil {
+		return
+	}
+
+	if !t.Enable {
+		t.Data = nil
 	}
 }
 

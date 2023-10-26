@@ -20,7 +20,7 @@ const (
 	FailWaitDuration = time.Duration(3) * time.Second
 )
 
-var defaultSendTimeout = time.Duration(time.Second * 15)
+var defaultSendTimeout = time.Duration(time.Second * 30)
 
 type MessageHandlerFactory = types.MessageHandlerFactory
 type MessageHandler = types.MessageHandler

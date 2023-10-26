@@ -13,6 +13,12 @@ type MessageHandler = types.MessageHandler
 type Status = types.InputStatus
 type Config = types.InputConfig
 
+// Params internal use only
+type Params struct {
+	Config *Config `json:"config,omitempty" yaml:"config,omitempty"`
+	ID     int     `json:"id" yaml:"id"`
+}
+
 // Result internal use only
 type Result struct {
 	RestartRequired *bool  `json:"restart_required,omitempty"`
@@ -36,10 +42,4 @@ type SetConfigResponse struct {
 type GetStatusResponse struct {
 	Response
 	Result *Status `json:"result,omitempty"`
-}
-
-// Params internal use only
-type Params struct {
-	Config *Config `json:"config,omitempty" yaml:"config,omitempty"`
-	ID     int     `json:"id,omitempty" yaml:"id,omitempty"`
 }

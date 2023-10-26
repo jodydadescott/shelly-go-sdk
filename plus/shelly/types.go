@@ -36,7 +36,9 @@ type ShellyConfig = types.ShellyConfig
 type DeviceInfo = types.DeviceInfo
 type ShellyUpdateConfig = types.ShellyUpdateConfig
 type ShellyAuthConfig = types.ShellyAuthConfig
-type ShellyTLSConfig = types.ShellyTLSConfig
+type ShellyUserCAConfig = types.ShellyUserCAConfig
+type ShellyTLSClientCertConfig = types.ShellyTLSClientCertConfig
+type ShellyTLSClientKeyConfig = types.ShellyTLSClientKeyConfig
 type UpdatesReport = types.UpdatesReport
 type SwitchStatus = types.SwitchStatus
 type SwitchAenergy = types.SwitchAenergy
@@ -240,55 +242,49 @@ func (t *RawShellyStatus) convert() *ShellyStatus {
 // RawShellyConfig internal use only
 // https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Shelly#configuration
 type RawShellyConfig struct {
-	TLSClientCert *ShellyTLSConfig `json:"tls_client_cert,omitempty" yaml:"tls_client_cert,omitempty"`
-	TLSClientKey  *ShellyTLSConfig `json:"tls_client_key,omitempty" yaml:"tls_client_key,omitempty"`
-	UserCA        *ShellyTLSConfig `json:"user_ca,omitempty" yaml:"user_ca,omitempty"`
-	Bluetooth     *BluetoothConfig `json:"ble,omitempty" yaml:"ble,omitempty"`
-	Cloud         *CloudConfig     `json:"cloud,omitempty" yaml:"cloud,omitempty"`
-	Mqtt          *MqttConfig      `json:"mqtt,omitempty" yaml:"mqtt,omitempty"`
-	Ethernet      *EthernetConfig  `json:"eth,omitempty" yaml:"eth,omitempty"`
-	System        *SystemConfig    `json:"sys,omitempty" yaml:"sys,omitempty"`
-	Wifi          *WifiConfig      `json:"wifi,omitempty" yaml:"wifi,omitempty"`
-	Websocket     *WebsocketConfig `json:"ws,omitempty" yaml:"ws,omitempty"`
-	Light0        *LightConfig     `json:"light:0,omitempty" yaml:"light:0,omitempty"`
-	Light1        *LightConfig     `json:"light:1,omitempty" yaml:"light:1,omitempty"`
-	Light2        *LightConfig     `json:"light:2,omitempty" yaml:"light:2,omitempty"`
-	Light3        *LightConfig     `json:"light:3,omitempty" yaml:"light:3,omitempty"`
-	Light4        *LightConfig     `json:"light:4,omitempty" yaml:"light:4,omitempty"`
-	Light5        *LightConfig     `json:"light:5,omitempty" yaml:"light:5,omitempty"`
-	Light6        *LightConfig     `json:"light:6,omitempty" yaml:"light:6,omitempty"`
-	Light7        *LightConfig     `json:"light:7,omitempty" yaml:"light:7,omitempty"`
-	Input0        *InputConfig     `json:"input:0,omitempty" yaml:"input:0,omitempty"`
-	Input1        *InputConfig     `json:"input:1,omitempty" yaml:"input:1,omitempty"`
-	Input2        *InputConfig     `json:"input:2,omitempty" yaml:"input:2,omitempty"`
-	Input3        *InputConfig     `json:"input:3,omitempty" yaml:"input:3,omitempty"`
-	Input4        *InputConfig     `json:"input:4,omitempty" yaml:"input:4,omitempty"`
-	Input5        *InputConfig     `json:"input:5,omitempty" yaml:"input:5,omitempty"`
-	Input6        *InputConfig     `json:"input:6,omitempty" yaml:"input:6,omitempty"`
-	Input7        *InputConfig     `json:"input:7,omitempty" yaml:"input:7,omitempty"`
-	Switch0       *SwitchConfig    `json:"switch:0,omitempty" yaml:"switch:0,omitempty"`
-	Switch1       *SwitchConfig    `json:"switch:1,omitempty" yaml:"switch:1,omitempty"`
-	Switch2       *SwitchConfig    `json:"switch:2,omitempty" yaml:"switch:2,omitempty"`
-	Switch3       *SwitchConfig    `json:"switch:3,omitempty" yaml:"switch:3,omitempty"`
-	Switch4       *SwitchConfig    `json:"switch:4,omitempty" yaml:"switch:4,omitempty"`
-	Switch5       *SwitchConfig    `json:"switch:5,omitempty" yaml:"switch:5,omitempty"`
-	Switch6       *SwitchConfig    `json:"switch:6,omitempty" yaml:"switch:6,omitempty"`
-	Switch7       *SwitchConfig    `json:"switch:7,omitempty" yaml:"switch:7,omitempty"`
+	Bluetooth *BluetoothConfig `json:"ble,omitempty" yaml:"ble,omitempty"`
+	Cloud     *CloudConfig     `json:"cloud,omitempty" yaml:"cloud,omitempty"`
+	Mqtt      *MqttConfig      `json:"mqtt,omitempty" yaml:"mqtt,omitempty"`
+	Ethernet  *EthernetConfig  `json:"eth,omitempty" yaml:"eth,omitempty"`
+	System    *SystemConfig    `json:"sys,omitempty" yaml:"sys,omitempty"`
+	Wifi      *WifiConfig      `json:"wifi,omitempty" yaml:"wifi,omitempty"`
+	Websocket *WebsocketConfig `json:"ws,omitempty" yaml:"ws,omitempty"`
+	Light0    *LightConfig     `json:"light:0,omitempty" yaml:"light:0,omitempty"`
+	Light1    *LightConfig     `json:"light:1,omitempty" yaml:"light:1,omitempty"`
+	Light2    *LightConfig     `json:"light:2,omitempty" yaml:"light:2,omitempty"`
+	Light3    *LightConfig     `json:"light:3,omitempty" yaml:"light:3,omitempty"`
+	Light4    *LightConfig     `json:"light:4,omitempty" yaml:"light:4,omitempty"`
+	Light5    *LightConfig     `json:"light:5,omitempty" yaml:"light:5,omitempty"`
+	Light6    *LightConfig     `json:"light:6,omitempty" yaml:"light:6,omitempty"`
+	Light7    *LightConfig     `json:"light:7,omitempty" yaml:"light:7,omitempty"`
+	Input0    *InputConfig     `json:"input:0,omitempty" yaml:"input:0,omitempty"`
+	Input1    *InputConfig     `json:"input:1,omitempty" yaml:"input:1,omitempty"`
+	Input2    *InputConfig     `json:"input:2,omitempty" yaml:"input:2,omitempty"`
+	Input3    *InputConfig     `json:"input:3,omitempty" yaml:"input:3,omitempty"`
+	Input4    *InputConfig     `json:"input:4,omitempty" yaml:"input:4,omitempty"`
+	Input5    *InputConfig     `json:"input:5,omitempty" yaml:"input:5,omitempty"`
+	Input6    *InputConfig     `json:"input:6,omitempty" yaml:"input:6,omitempty"`
+	Input7    *InputConfig     `json:"input:7,omitempty" yaml:"input:7,omitempty"`
+	Switch0   *SwitchConfig    `json:"switch:0,omitempty" yaml:"switch:0,omitempty"`
+	Switch1   *SwitchConfig    `json:"switch:1,omitempty" yaml:"switch:1,omitempty"`
+	Switch2   *SwitchConfig    `json:"switch:2,omitempty" yaml:"switch:2,omitempty"`
+	Switch3   *SwitchConfig    `json:"switch:3,omitempty" yaml:"switch:3,omitempty"`
+	Switch4   *SwitchConfig    `json:"switch:4,omitempty" yaml:"switch:4,omitempty"`
+	Switch5   *SwitchConfig    `json:"switch:5,omitempty" yaml:"switch:5,omitempty"`
+	Switch6   *SwitchConfig    `json:"switch:6,omitempty" yaml:"switch:6,omitempty"`
+	Switch7   *SwitchConfig    `json:"switch:7,omitempty" yaml:"switch:7,omitempty"`
 }
 
 func (t *RawShellyConfig) convert() *ShellyConfig {
 
 	c := &ShellyConfig{
-		TLSClientCert: t.TLSClientCert,
-		TLSClientKey:  t.TLSClientKey,
-		UserCA:        t.UserCA,
-		Bluetooth:     t.Bluetooth,
-		Cloud:         t.Cloud,
-		Mqtt:          t.Mqtt,
-		Ethernet:      t.Ethernet,
-		System:        t.System,
-		Wifi:          t.Wifi,
-		Websocket:     t.Websocket,
+		Bluetooth: t.Bluetooth,
+		Cloud:     t.Cloud,
+		Mqtt:      t.Mqtt,
+		Ethernet:  t.Ethernet,
+		System:    t.System,
+		Wifi:      t.Wifi,
+		Websocket: t.Websocket,
 	}
 
 	if t.Light0 != nil {
@@ -381,4 +377,18 @@ type RawShellyAuthConfig struct {
 	// Ha1 is used by the following methods:
 	// SetAuth : "user:realm:password" encoded in SHA256 (null to disable authentication). Required
 	Ha1 string `json:"ha1,omitempty" yaml:"ha1,omitempty"`
+}
+
+// RawShellyTLSConfig internal use only
+type RawShellyTLSConfig struct {
+	// Data is used by the following methods:
+	// PutUserCA : Contents of the PEM file (null if you want to delete the existing data). Required
+	// PutTLSClientCert : Contents of the client.crt file (null if you want to delete the existing data). Required
+	// PutTLSClientKey : Contents of the client.key file (null if you want to delete the existing data). Required
+	Data *string `json:"data,omitempty" yaml:"data,omitempty"`
+	// Append is used by the following methods:
+	// PutUserCA : true if more data will be appended afterwards, default false.
+	// PutTLSClientCert : true if more data will be appended afterwards, default false
+	// PutTLSClientKey : true if more data will be appended afterwards, default false
+	Append *bool `json:"append,omitempty" yaml:"append,omitempty"`
 }

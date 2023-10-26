@@ -163,6 +163,21 @@ func (t *Client) SetConfig(ctx context.Context, config *ShellyConfig) *ShellyRep
 
 	report := &ShellyReport{}
 
+	if config.UserCA != nil {
+		report.UserCA = &ComponentReport{}
+		report.UserCA.Error = t.setUserCA(ctx, config.UserCA)
+	}
+
+	if config.TLSClientCert != nil {
+		report.TLSClientCert = &ComponentReport{}
+		report.TLSClientCert.Error = t.setTLSClientCert(ctx, config.TLSClientCert)
+	}
+
+	if config.TLSClientKey != nil {
+		report.TLSClientKey = &ComponentReport{}
+		report.TLSClientKey.Error = t.setTLSClientKey(ctx, config.TLSClientKey)
+	}
+
 	if config.Bluetooth != nil {
 		report.Bluetooth = &ComponentReport{}
 		rebootRequired, err := t.Bluetooth().SetConfig(ctx, config.Bluetooth)
@@ -462,14 +477,9 @@ func (t *Client) setAuth(ctx context.Context, config *ShellyAuthConfig) error {
 	return nil
 }
 
-func (t *Client) PutTLSClientCert(ctx context.Context, config *ShellyTLSConfig) error {
+func (t *Client) send(ctx context.Context, request *Request) error {
 
-	method := Component + ".PutTLSClientCert"
-
-	respBytes, err := t.getMessageHandler().Send(ctx, &Request{
-		Method: &method,
-		Params: config,
-	})
+	respBytes, err := t.getMessageHandler().Send(ctx, request)
 	if err != nil {
 		return err
 	}
@@ -487,54 +497,151 @@ func (t *Client) PutTLSClientCert(ctx context.Context, config *ShellyTLSConfig) 
 	return nil
 }
 
-func (t *Client) PutTLSClientKey(ctx context.Context, config *ShellyTLSConfig) error {
-
-	method := Component + ".PutTLSClientKey"
-
-	respBytes, err := t.getMessageHandler().Send(ctx, &Request{
-		Method: &method,
-		Params: config,
-	})
-	if err != nil {
-		return err
-	}
-
-	response := &SetConfigResponse{}
-	err = json.Unmarshal(respBytes, response)
-	if err != nil {
-		return err
-	}
-
-	if response.Error != nil {
-		return response.Error
-	}
-
-	return nil
-}
-
-func (t *Client) PutUserCA(ctx context.Context, config *ShellyTLSConfig) error {
+func (t *Client) setUserCA(ctx context.Context, config *ShellyUserCAConfig) error {
 
 	method := Component + ".PutUserCA"
 
-	respBytes, err := t.getMessageHandler().Send(ctx, &Request{
+	if config.Enable {
+
+		if config.Data == nil {
+			return fmt.Errorf("Missing required data")
+		}
+
+		data := splitByWidth(*config.Data, maxRPCChunkSize)
+		counter := 0
+		append := true
+
+		for _, chunk := range data {
+
+			counter++
+
+			if len(data) <= counter {
+				append = false
+			}
+
+			err := t.send(ctx, &Request{
+				Method: &method,
+				Params: &RawShellyTLSConfig{
+					Data:   &chunk,
+					Append: &append,
+				},
+			})
+
+			if err != nil {
+				return err
+			}
+
+		}
+
+		return nil
+	}
+
+	append := false
+
+	return t.send(ctx, &Request{
 		Method: &method,
-		Params: config,
+		Params: &RawShellyTLSConfig{
+			Append: &append,
+		},
 	})
-	if err != nil {
-		return err
+}
+
+func (t *Client) setTLSClientCert(ctx context.Context, config *ShellyTLSClientCertConfig) error {
+
+	method := Component + ".PutTLSClientCert"
+
+	if config.Enable {
+
+		if config.Data == nil {
+			return fmt.Errorf("Missing required data")
+		}
+
+		data := splitByWidth(*config.Data, maxRPCChunkSize)
+		counter := 0
+		append := true
+
+		for _, chunk := range data {
+
+			counter++
+
+			if len(data) <= counter {
+				append = false
+			}
+
+			err := t.send(ctx, &Request{
+				Method: &method,
+				Params: &RawShellyTLSConfig{
+					Data:   &chunk,
+					Append: &append,
+				},
+			})
+
+			if err != nil {
+				return err
+			}
+
+		}
+
+		return nil
 	}
 
-	response := &SetConfigResponse{}
-	err = json.Unmarshal(respBytes, response)
-	if err != nil {
-		return err
+	append := false
+
+	return t.send(ctx, &Request{
+		Method: &method,
+		Params: &RawShellyTLSConfig{
+			Append: &append,
+		},
+	})
+}
+
+func (t *Client) setTLSClientKey(ctx context.Context, config *ShellyTLSClientKeyConfig) error {
+
+	method := Component + ".PutTLSClientKey"
+
+	if config.Enable {
+
+		if config.Data == nil {
+			return fmt.Errorf("Missing required data")
+		}
+
+		data := splitByWidth(*config.Data, maxRPCChunkSize)
+		counter := 0
+		append := true
+
+		for _, chunk := range data {
+
+			counter++
+
+			if len(data) <= counter {
+				append = false
+			}
+
+			err := t.send(ctx, &Request{
+				Method: &method,
+				Params: &RawShellyTLSConfig{
+					Data:   &chunk,
+					Append: &append,
+				},
+			})
+
+			if err != nil {
+				return err
+			}
+
+		}
+
+		return nil
 	}
 
-	if response.Error != nil {
-		return response.Error
-	}
+	append := false
 
-	return nil
+	return t.send(ctx, &Request{
+		Method: &method,
+		Params: &RawShellyTLSConfig{
+			Append: &append,
+		},
+	})
 }
 
 func (t *Client) Close() {

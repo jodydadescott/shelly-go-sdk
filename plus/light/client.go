@@ -132,6 +132,7 @@ func (t *Client) SetConfig(ctx context.Context, config *Config) error {
 	respBytes, err := t.getMessageHandler().Send(ctx, &Request{
 		Method: &method,
 		Params: &Params{
+			ID:     config.ID,
 			Config: config,
 		},
 	})

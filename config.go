@@ -1,9 +1,12 @@
 package shelly
 
+import "time"
+
 type Config struct {
 	Hostname     string
 	Password     string
 	DebugEnabled bool
+	SendTimeout  time.Duration
 }
 
 func (t *Config) GetHostname() string {
@@ -16,4 +19,8 @@ func (t *Config) GetPassword() string {
 
 func (t *Config) IsDebugEnabled() bool {
 	return t.DebugEnabled
+}
+
+func (t *Config) GetSendTimeout() time.Duration {
+	return t.SendTimeout
 }

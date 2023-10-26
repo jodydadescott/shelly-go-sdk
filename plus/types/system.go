@@ -159,6 +159,50 @@ type SystemDevice struct {
 	AddonType *string `json:"addon_type,omitempty" yaml:"addon_type,omitempty"`
 }
 
+// // Markup markup config
+// func (t *SystemDevice) SetFromEnv() error {
+
+// 	if t == nil {
+// 		return nil
+// 	}
+
+// 	nameVar := os.Getenv(ShellyEnvVar + ".name")
+// 	ecomodeVar := os.Getenv(ShellyEnvVar + ".eco_mode")
+// 	profileVar := os.Getenv(ShellyEnvVar + ".profile")
+// 	discoverableVar := os.Getenv(ShellyEnvVar + ".discoverable")
+// 	addonTypeVar := os.Getenv(ShellyEnvVar + ".addon_type")
+
+// 	if nameVar != "" {
+// 		t.Name = &nameVar
+// 	}
+
+// 	if ecomodeVar != "" {
+// 		x, err := strconv.ParseBool(ecomodeVar)
+// 		if err != nil {
+// 			return err
+// 		}
+// 		t.EcoMode = &x
+// 	}
+
+// 	if profileVar != "" {
+// 		t.Profile = &profileVar
+// 	}
+
+// 	if discoverableVar != "" {
+// 		x, err := strconv.ParseBool(discoverableVar)
+// 		if err != nil {
+// 			return err
+// 		}
+// 		t.Discoverable = &x
+// 	}
+
+// 	if addonTypeVar != "" {
+// 		t.Profile = &profileVar
+// 	}
+
+// 	return nil
+// }
+
 // Clone return copy
 func (t *SystemDevice) Clone() *SystemDevice {
 	c := &SystemDevice{}

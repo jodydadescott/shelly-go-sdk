@@ -1,6 +1,8 @@
 package plus
 
 import (
+	"time"
+
 	"go.uber.org/zap"
 
 	"github.com/jodydadescott/shelly-go-sdk/plus/bluetooth"
@@ -22,6 +24,7 @@ type Config interface {
 	GetHostname() string
 	GetPassword() string
 	IsDebugEnabled() bool
+	GetSendTimeout() time.Duration
 }
 
 type Client struct {
@@ -46,6 +49,7 @@ func New(config Config) (*Client, error) {
 		Password:     config.GetPassword(),
 		Username:     types.ShellyUser,
 		DebugEnabled: config.IsDebugEnabled(),
+		SendTimeout:  config.GetSendTimeout(),
 	})
 
 	if err != nil {
