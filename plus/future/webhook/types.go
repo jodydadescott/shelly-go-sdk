@@ -1,7 +1,7 @@
 package webhook
 
 import (
-	"github.com/jodydadescott/shelly-go-sdk/shelly/plus/types"
+	"github.com/jodydadescott/shelly-go-sdk/plus/types"
 )
 
 type Request = types.Request
